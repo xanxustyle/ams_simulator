@@ -1,8 +1,9 @@
-# `ams_simulator`: ROS-based simulations of Autonomous Marine System (AMS) with Gazebo
+# `AMS Simulator`
+# ROS-based simulations of Autonomous Marine System (AMS) in Gazebo
 
 [![License](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://github.com/xanxustyle/ams_simulator/blob/main/LICENSE)
 
-The **Autonomous Marine System Simulator** is a set of packages that include plugins and ROS applications that allow simulation of underwater vehicles in [Gazebo](http://gazebosim.org/). The packages are built upon the [UUV Simulator](https://github.com/uuvsimulator/uuv_simulator).
+The **Autonomous Marine System Simulator** is a simulation environment for fast-prototyping and evaluation of marine robotic systems in [ROS 1](http://wiki.ros.org/) and [Gazebo](http://gazebosim.org/). The packages are built upon the [UUV Simulator](https://github.com/uuvsimulator/uuv_simulator).
 
 # Features
 
@@ -32,7 +33,7 @@ The **Autonomous Marine System Simulator** is a set of packages that include plu
   
 # Installation
 
-This package is based on ROS Noetic and Gazebo 11.
+This package requires ROS Noetic and Gazebo 11 on Ubuntu 20.04 Focal Fossa (64-bit).
 
 - `Noetic Ninjemys` (See [installation instructions for ROS Noetic](https://wiki.ros.org/noetic/Installation/Ubuntu))
 - `Gazebo 11` (See [installation instructions for Gazebo 11](https://classic.gazebosim.org/tutorials?cat=install&tut=install_ubuntu&ver=11.0))

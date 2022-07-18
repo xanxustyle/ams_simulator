@@ -88,33 +88,37 @@
         <arg name="namespace" value="$(arg namespace1)"/>
         <arg name="use_ned_frame" value="$(arg use_ned_frame)"/>
     </include>
-    <include file="$(find uuv_control_utils)/launch/send_waypoints_file.launch">
-        <arg name="uuv_name" value="$(arg namespace1)"/>
-        <arg name="filename" value="$(find nemo)/config/waypoint_slam.yaml"/>
-        <arg name="interpolator" value="lipb"/>
-    </include>
+    <node pkg="nemo" type="send_waypoint_file.py" name="send_waypoint_file" ns="$(arg namespace1)" output="screen">
+          <rosparam subst_value="true">
+                    filename: "$(find nemo)/config/waypoint_slam.yaml"
+                    start_time: -1
+                    interpolator: "lipb"
+          </rosparam>
+    </node>
     <!-- lipb: wpt_speed=2.4 look_ahead=2
       dubins4: wpt_speed=2.6 look_ahead=4 -->
 
 
 
     <!-- AUV2 launch -->
-<!--    <include file="$(find nemo)/launch/upload_nemo.launch">-->
-<!--        <arg name="namespace" value="$(arg namespace2)"/>-->
-<!--        <arg name="x" value="10"/>-->
-<!--        <arg name="y" value="10"/>-->
-<!--        <arg name="z" value="-10"/>-->
-<!--        <arg name="yaw" value="1.57"/>-->
-<!--    </include>-->
-<!--    <include file="$(find nemo)/launch/sm_control_nemo.launch">-->
-<!--        <arg name="namespace" value="$(arg namespace2)"/>-->
-<!--        <arg name="use_ned_frame" value="$(arg use_ned_frame)"/>-->
-<!--    </include>-->
-<!--    <include file="$(find uuv_control_utils)/launch/send_waypoints_file.launch">-->
-<!--        <arg name="uuv_name" value="$(arg namespace2)"/>-->
-<!--        <arg name="filename" value="$(find nemo)/config/waypoint2.yaml"/>-->
-<!--        <arg name="interpolator" value="lipb"/>-->
-<!--    </include>-->
+    <include file="$(find nemo)/launch/upload_nemo.launch">
+        <arg name="namespace" value="$(arg namespace2)"/>
+        <arg name="x" value="10"/>
+        <arg name="y" value="10"/>
+        <arg name="z" value="-10"/>
+        <arg name="yaw" value="1.57"/>
+    </include>
+    <include file="$(find nemo)/launch/sm_control_nemo.launch">
+        <arg name="namespace" value="$(arg namespace2)"/>
+        <arg name="use_ned_frame" value="$(arg use_ned_frame)"/>
+    </include>
+    <node pkg="nemo" type="send_waypoint_file.py" name="send_waypoint_file" ns="$(arg namespace2)" output="screen">
+          <rosparam subst_value="true">
+                    filename: "$(find nemo)/config/waypoint_slam.yaml"
+                    start_time: -1
+                    interpolator: "lipb"
+          </rosparam>
+    </node>
 
     <!-- Initialize the recording fo the simulation according to the record flag -->
     <include file="$(find nemo)/launch/record_demo.launch">
