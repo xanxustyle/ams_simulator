@@ -1,0 +1,125 @@
+<launch>
+    <arg name="gui" default="true"/>
+    <arg name="paused" default="false"/>
+    <arg name="world_name" default="$(find nemo)/world/stratified_current.world"/>
+    <arg name="set_timeout" default="false"/>
+    <arg name="timeout" default="0.0"/>
+    
+    <arg name="namespace1" default="nemo1"/>
+    <arg name="namespace2" default="nemo2"/>
+    <arg name="use_ned_frame" default="true"/>
+
+    <arg name="record" default="false"/>
+    <arg name="bag_filename" default="recording.bag"/>
+
+    <remap from="/$(arg namespace1)/imu" to="/imu/imu" />
+    <remap from="/$(arg namespace1)/$(arg namespace1)/camera1/camera_info" to="/slave1/image_raw/cam_info" />
+    <remap from="/$(arg namespace1)/$(arg namespace1)/camera2/camera_info" to="/slave2/image_raw/cam_info" />
+    <remap from="/$(arg namespace1)/$(arg namespace1)/camera1/camera_image/compressed" to="/slave1/image_raw/compressed" />
+    <remap from="/$(arg namespace1)/$(arg namespace1)/camera2/camera_image/compressed" to="/slave2/image_raw/compressed" />
+    
+      
+<!--    <include file="$(find uuv_assistants)/launch/unpause_simulation.launch">-->
+<!--        <arg name="timeout" value="5"/>-->
+<!--    </include>-->
+
+    <!-- Use Gazebo's empty_world.launch with the specified world file -->
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="world_name" value="$(arg world_name)"/>
+        <arg name="paused" value="$(arg paused)"/>
+        <arg name="use_sim_time" value="true"/>
+        <arg name="gui" value="$(arg gui)"/>
+        <arg name="headless" value="false"/>
+        <arg name="debug" value="false"/>
+        <arg name="verbose" value="true"/>
+    </include>
+    
+    <include file="$(find uuv_assistants)/launch/publish_world_ned_frame.launch"/>
+    
+    <node name="publish_world_models"
+          pkg="uuv_assistants"
+          type="publish_world_models.py"
+          output="screen">
+          <rosparam subst_value="true">
+            meshes:
+                heightmap:
+                    mesh: package://uuv_gazebo_worlds/models/coral_heightmap/meshes/heightmap.dae
+                    model: coral_heightmap
+                seafloor:
+                    plane: [2000, 2000, 0.1]
+                    pose:
+                        position: [0, 0, -500]
+                north:
+                    plane: [0.1, 2000, 500]
+                    pose:
+                        position: [1000, 0, -250]
+                south:
+                    plane: [0.1, 2000, 500]
+                    pose:
+                        position: [-1000, 0, -250]
+                west:
+                    plane: [2000, 0.1, 500]
+                    pose:
+                        position: [0, -1000, -250]
+                east:
+                    plane: [2000, 0.1, 500]
+                    pose:
+                        position: [0, 1000, -250]
+          </rosparam>
+    </node>
+
+    <!-- Timeout -->
+    <group if="$(arg set_timeout)">
+        <include file="$(find uuv_assistants)/launch/set_simulation_timer.launch">
+            <arg name="timeout" value="$(arg timeout)"/>
+        </include>
+    </group>
+
+    <!-- AUV1 launch -->
+    <include file="$(find nemo)/launch/upload_nemo.launch">
+        <arg name="namespace" value="$(arg namespace1)"/>
+        <arg name="use_ned_frame" value="$(arg use_ned_frame)"/>
+        <arg name="x" value="0"/>
+        <arg name="y" value="0"/>
+        <arg name="z" value="-320"/>
+        <arg name="yaw" value="0"/>
+    </include>
+    <include file="$(find nemo)/launch/sm_control_nemo.launch">
+        <arg name="namespace" value="$(arg namespace1)"/>
+        <arg name="use_ned_frame" value="$(arg use_ned_frame)"/>
+    </include>
+    <include file="$(find uuv_control_utils)/launch/send_waypoints_file.launch">
+        <arg name="uuv_name" value="$(arg namespace1)"/>
+        <arg name="filename" value="$(find nemo)/config/waypoint_slam.yaml"/>
+        <arg name="interpolator" value="lipb"/>
+    </include>
+    <!-- lipb: wpt_speed=2.4 look_ahead=2
+      dubins4: wpt_speed=2.6 look_ahead=4 -->
+
+
+
+    <!-- AUV2 launch -->
+<!--    <include file="$(find nemo)/launch/upload_nemo.launch">-->
+<!--        <arg name="namespace" value="$(arg namespace2)"/>-->
+<!--        <arg name="x" value="10"/>-->
+<!--        <arg name="y" value="10"/>-->
+<!--        <arg name="z" value="-10"/>-->
+<!--        <arg name="yaw" value="1.57"/>-->
+<!--    </include>-->
+<!--    <include file="$(find nemo)/launch/sm_control_nemo.launch">-->
+<!--        <arg name="namespace" value="$(arg namespace2)"/>-->
+<!--        <arg name="use_ned_frame" value="$(arg use_ned_frame)"/>-->
+<!--    </include>-->
+<!--    <include file="$(find uuv_control_utils)/launch/send_waypoints_file.launch">-->
+<!--        <arg name="uuv_name" value="$(arg namespace2)"/>-->
+<!--        <arg name="filename" value="$(find nemo)/config/waypoint2.yaml"/>-->
+<!--        <arg name="interpolator" value="lipb"/>-->
+<!--    </include>-->
+
+    <!-- Initialize the recording fo the simulation according to the record flag -->
+    <include file="$(find nemo)/launch/record_demo.launch">
+        <arg name="record" value="$(arg record)"/>
+        <arg name="use_ned_frame" value="$(arg use_ned_frame)"/>
+        <arg name="bag_filename" value="$(arg bag_filename)"/>
+    </include>
+</launch>

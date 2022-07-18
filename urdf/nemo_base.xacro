@@ -1,0 +1,196 @@
+<?xml version="1.0"?>
+<!-- Copyright (c) 2016 The UUV Simulator Authors.
+     All rights reserved.
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" >
+  <!-- Import macro files -->
+  <xacro:include filename="$(find uuv_descriptions)/urdf/common.urdf.xacro" />
+  <xacro:include filename="$(find uuv_sensor_ros_plugins)/urdf/sensor_snippets.xacro"/>
+  <xacro:include filename="$(find nemo)/urdf/nemo_snippets.xacro"/>
+  <xacro:include filename="$(find uuv_gazebo_ros_plugins)/urdf/snippets.xacro"/>
+  <!-- Properties -->
+  <xacro:property name="namespace" default="nemo"/>
+  <xacro:property name="mass" value="69.7"/>
+  <xacro:property name="length" value="1.98"/>
+  <xacro:property name="diameter" value="0.23"/>
+  <xacro:property name="radius" value="${diameter*0.5}"/>
+  <xacro:property name="volume" value="0.06799987704121499"/>
+  <xacro:property name="cob" value="0 0 0.06"/>
+  <xacro:property name="rho" value="1026"/>
+
+  <xacro:property name="area" value="0.04155"/>
+  <xacro:property name="length" value="1.98"/>
+
+  <xacro:property name="visual_mesh_file" value="file://$(find nemo)/mesh/nemo.dae"/>
+  <xacro:property name="collision_mesh_file" value="file://$(find nemo)/mesh/nemo.stl"/>
+  <xacro:property name="prop_mesh_file" value="file://$(find nemo)/mesh/nemo_propeller.dae"/>
+  <xacro:property name="fin_mesh_file" value="file://$(find nemo)/mesh/nemo_fin.dae"/>
+  
+  <xacro:property name="debug" value="0"/>
+
+  <xacro:macro name="nemo_base" params="namespace debug inertial_reference_frame">
+    <link name="${namespace}/base_link" />
+
+    <link name="${namespace}/base_dummy">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="${visual_mesh_file}" scale="1 1 1" />
+        </geometry>
+      </visual>
+
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="${visual_mesh_file}" scale="1 1 1" />
+        </geometry>
+      </collision>
+
+      <inertial>
+        <mass value="${mass}" />
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <inertia ixx="0.6" ixy="0" ixz="0"
+                 iyy="30.0" iyz="0"
+                 izz="35.0" />
+      </inertial>
+    </link>
+
+    <joint name="${namespace}/base_dummy_joint" type="fixed">
+      <parent link="${namespace}/base_link" />
+      <child link="${namespace}/base_dummy" />
+    </joint>
+    
+    <!-- Set up hydrodynamic plugin -->
+    <gazebo>
+      <!-- Create plugin to generate depth-dependent current for this vehicle-->
+      <plugin name="dave_transient_current_plugin" filename="libdave_ocean_current_model_plugin.so">
+        <flow_velocity_topic>hydrodynamics/current_velocity/$(arg namespace)</flow_velocity_topic>
+        <base_link_name>$(arg namespace)/base_link</base_link_name>
+        <transient_current>
+          <topic_stratified>stratified_current_velocity</topic_stratified>
+          <velocity_north>
+            <noiseAmp>0.3</noiseAmp>
+            <noiseFreq>0.0</noiseFreq>
+          </velocity_north>
+          <velocity_east>
+            <noiseAmp>0.3</noiseAmp>
+            <noiseFreq>0.0</noiseFreq>
+          </velocity_east>
+          <velocity_down>
+            <noiseAmp>0.3</noiseAmp>
+            <noiseFreq>0.0</noiseFreq>
+          </velocity_down>
+        </transient_current>
+        <tide_oscillation>true</tide_oscillation>
+      </plugin>
+      
+      <plugin name="${namespace}_uuv_plugin" filename="libuuv_underwater_object_ros_plugin.so">
+        <fluid_density>${rho}</fluid_density>
+        <flow_velocity_topic>hydrodynamics/current_velocity</flow_velocity_topic>
+        <debug>${debug}</debug>
+        <link name="${namespace}/base_link">
+          <volume>${volume}</volume>
+          <center_of_buoyancy>${cob}</center_of_buoyancy>
+          <neutrally_buoyant>0</neutrally_buoyant>
+          <hydrodynamic_model>
+            <type>fossen</type>
+            <added_mass>
+              4   0   0   0   0   0
+              0   95  0   0   0   0
+              0   0   75  0   0   0
+              0   0   0   0.4 0   0
+              0   0   0   0   27  0
+              0   0   0   0   0   32
+            </added_mass>
+
+            <linear_damping_forward_speed>
+              -8      0       0       0       0       0
+              0       -162    0       0       0       150
+              0       0       -108    0       -100    0
+              0       0       0       -13     0       0
+              0       0       37      0       -20     0
+              0       -34     0       0       0       -32
+            </linear_damping_forward_speed>
+          </hydrodynamic_model>
+        </link>
+      </plugin>
+    </gazebo>
+
+    <!-- Instantiate Fins -->
+    <!-- Tri-form -->
+    <xacro:fin_macro namespace="${namespace}" fin_id="0">
+      <origin xyz="-0.70777 0 0.11126" rpy="0 0 0" />
+    </xacro:fin_macro>
+    <xacro:fin_macro namespace="${namespace}" fin_id="1">
+      <origin xyz="-0.70777 -0.096354 -0.05563" rpy="${0.66667*pi} 0 0" />
+    </xacro:fin_macro>
+    <xacro:fin_macro namespace="${namespace}" fin_id="2">
+      <origin xyz="-0.70777 0.096354 -0.05563" rpy="${-0.66667*pi} 0 0" />
+    </xacro:fin_macro>
+    
+    <!-- Cruciform -->
+<!--    <xacro:fin_macro namespace="${namespace}" fin_id="0">-->
+<!--      <origin xyz="-0.70777 0 0.11126" rpy="0 0 0" />-->
+<!--    </xacro:fin_macro>-->
+<!--    <xacro:fin_macro namespace="${namespace}" fin_id="1">-->
+<!--      <origin xyz="-0.70777 -0.11126 0" rpy="${0.5*pi} 0 0" />-->
+<!--    </xacro:fin_macro>-->
+<!--    <xacro:fin_macro namespace="${namespace}" fin_id="2">-->
+<!--      <origin xyz="-0.70777 0 -0.11126" rpy="${pi} 0 0" />-->
+<!--    </xacro:fin_macro>-->
+<!--    <xacro:fin_macro namespace="${namespace}" fin_id="3">-->
+<!--      <origin xyz="-0.70777 0.11126 0" rpy="${-0.5*pi} 0 0" />-->
+<!--    </xacro:fin_macro>-->
+    
+    <!-- X-form -->
+<!--    <xacro:fin_macro namespace="${namespace}" fin_id="0">-->
+<!--      <origin xyz="-0.70777 -0.07876 0.078586" rpy="0.7904 -0.0998 -0.1003" />-->
+<!--    </xacro:fin_macro>-->
+<!--    <xacro:fin_macro namespace="${namespace}" fin_id="1">-->
+<!--      <origin xyz="-0.70777 -0.07876 -0.078586" rpy="2.3512 0.0998 -0.1003" />-->
+<!--    </xacro:fin_macro>-->
+<!--    <xacro:fin_macro namespace="${namespace}" fin_id="2">-->
+<!--      <origin xyz="-0.70777 0.07876 -0.078586" rpy="-2.3512 0.0998 0.1003" />-->
+<!--    </xacro:fin_macro>-->
+<!--    <xacro:fin_macro namespace="${namespace}" fin_id="3">-->
+<!--      <origin xyz="-0.70777 0.07876 0.078586" rpy="-0.7904 -0.0998 0.1003" />-->
+<!--    </xacro:fin_macro>-->
+
+    <xacro:thruster_module_first_order_basic_fcn_macro
+      namespace="${namespace}"
+      thruster_id="0"
+      mesh_filename="${prop_mesh_file}"
+      dyn_time_constant="0.1"
+      rotor_constant="0.000049">
+      <origin xyz="-0.9676 0 0" rpy="0 0 ${pi}" />
+    </xacro:thruster_module_first_order_basic_fcn_macro>
+
+    <!-- TODO: Parametrize the battery unit -->
+    <xacro:basic_linear_battery_macro
+      namespace="${namespace}"
+      parent_link="${namespace}/base_link"
+      prefix=""
+      open_circuit_voltage_constant_coef="3.7"
+      open_circuit_voltage_linear_coef="-3.1424"
+      initial_charge="1.1665"
+      capacity="0.5"
+      resistance="0.002"
+      smooth_current_tau="1.9499"
+      voltage="4.2"
+      update_rate="2.0"/>
+
+    <xacro:include filename="$(find nemo)/urdf/nemo_sensors.xacro"/>
+  </xacro:macro>
+</robot>

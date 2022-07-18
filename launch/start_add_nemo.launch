@@ -1,0 +1,24 @@
+<launch>
+    <arg name="namespace" default="nemo"/>
+    <arg name="use_ned_frame" default="true"/>
+
+    <!-- More AUV launch -->
+    <include file="$(find nemo)/launch/upload_nemo.launch">
+        <arg name="namespace" value="$(arg namespace)"/>
+        <arg name="x" value="10"/>
+        <arg name="y" value="10"/>
+        <arg name="z" value="-10"/>
+        <arg name="yaw" value="1.57"/>
+    </include>
+
+    <include file="$(find nemo)/launch/sm_control_nemo.launch">
+        <arg name="namespace" value="$(arg namespace)"/>
+        <arg name="use_ned_frame" value="$(arg use_ned_frame)"/>
+    </include>
+    <include file="$(find uuv_control_utils)/launch/send_waypoints_file.launch">
+        <arg name="uuv_name" value="$(arg namespace)"/>
+        <arg name="filename" value="$(find nemo)/config/waypoint2.yaml"/>
+        <arg name="interpolator" value="lipb"/>
+    </include>
+
+</launch>

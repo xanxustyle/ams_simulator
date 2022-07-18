@@ -1,0 +1,115 @@
+<launch>
+    <arg name="namespace" default="nemo"/>
+    <arg name="gui" default="true"/>
+    <arg name="use_ned_frame" default="true"/>
+
+    <arg name="Kd" 
+         default="24.328999405818507,95.16574836816616,25.943377407248825,0,6.388371356010936,79.2844976871164"
+         doc="Coefficients for the $K_d$ diagonal matrix"/>
+    <arg name="Ki"
+         default="0.0010232768152540483,0.0010232768152540483,0.0010232768152540483,0,0.11901644069756079,0.11901644069756079"
+         doc="Coefficients for the $K_i$ diagonal matrix"/>
+    <arg name="slope"
+         default="0.9903858668992097,0.9903858668992097,0.9903858668992097,0,0.20796465986893387,0.20796465986893387"
+         doc="Coefficients for the $\alpha$ diagonal matrix"/>
+    <arg name="look_ahead_delay" default="2"/>
+    <arg name="min_thrust" default="40"/>
+
+
+    <include file="$(find uuv_auv_control_allocator)/launch/start_control_allocator.launch">        
+        <arg name="uuv_name" value="$(arg namespace)"/>
+        <arg name="output_dir" value="$(find nemo)/config"/>
+        <arg name="base_link" value="base_link"/>
+        <arg name="max_thrust" value="50"/>
+        <arg name="thruster_conversion_fcn" value="proportional"/>
+        <arg name="thruster_gain" value="0.000049"/>
+        <arg name="fluid_density" value="1026.0"/>
+        <arg name="lift_coefficient" value="3.0"/>
+        <arg name="fin_area" value="0.04155"/>
+        <arg name="fin_lower_joint_limit" value="-1.4"/> 
+        <arg name="fin_upper_joint_limit" value="1.4"/> 
+        <arg name="timeout" value="-1"/>
+        <arg name="update_rate" value="10"/>
+    </include>
+
+    <group ns="$(arg namespace)">
+      <node pkg="uuv_trajectory_control"
+            type="rov_nmb_sm_controller.py"
+            name="rov_nmb_sm_controller"
+            output="screen"
+            if="$(arg use_ned_frame)">
+            <!-- Remap necessary topics -->
+            <remap from="odom" to="pose_gt_ned"/>
+            <remap from="trajectory" to="dp_controller/trajectory"/>
+            <remap from="input_trajectory" to="dp_controller/input_trajectory"/>
+            <remap from="waypoints" to="dp_controller/waypoints"/>
+            <remap from="error" to="dp_controller/error"/>
+            <remap from="reference" to="dp_controller/reference"/>
+            <remap from="thruster_output" to="thruster_manager/input_stamped"/>
+            <remap from="auv_command_output" to="control_allocation/control_input"/>
+            <!-- Controller parameters -->
+            <rosparam subst_value="true">
+              saturation: 200
+              thrusters_only: false
+              Kd: [$(arg Kd)]
+              Ki: [$(arg Ki)]
+              slope: [$(arg slope)]
+              inertial_frame_id: world_ned
+              max_forward_speed: 3.0
+              use_stamped_poses_only: false
+              look_ahead_delay: $(arg look_ahead_delay)
+              min_thrust: $(arg min_thrust)
+              dubins: 
+                radius: 4
+                max_pitch: 0.09
+            </rosparam>
+      </node>
+
+      <node pkg="uuv_trajectory_control"
+            type="rov_nmb_sm_controller.py"
+            name="rov_nmb_sm_controller"
+            output="screen"
+            unless="$(arg use_ned_frame)">
+            <!-- Remap necessary topics -->
+            <remap from="odom" to="pose_gt"/>
+            <remap from="trajectory" to="dp_controller/trajectory"/>
+            <remap from="input_trajectory" to="dp_controller/input_trajectory"/>
+            <remap from="waypoints" to="dp_controller/waypoints"/>
+            <remap from="error" to="dp_controller/error"/>
+            <remap from="reference" to="dp_controller/reference"/>
+            <remap from="thruster_output" to="thruster_manager/input_stamped"/>
+            <remap from="auv_command_output" to="control_allocation/control_input"/>
+            <!-- Controller parameters -->
+            <rosparam subst_value="true">
+              saturation: 200
+              thrusters_only: false
+              Kd: [$(arg Kd)]
+              Ki: [$(arg Ki)]
+              slope: [$(arg slope)]
+              inertial_frame_id: world
+              max_forward_speed: 3.0
+              use_stamped_poses_only: false
+              look_ahead_delay: $(arg look_ahead_delay)
+              min_thrust: $(arg min_thrust)
+              dubins: 
+                radius: 4
+                max_pitch: 0.09
+            </rosparam>
+      </node>
+    </group>
+
+    <group if="$(arg gui)">
+        <!-- This node reads the trajectory and waypoint topics and publishes on RViz -->
+        <group ns="$(arg namespace)">
+            <node pkg="uuv_control_utils"
+                  type="trajectory_marker_publisher.py"
+                  name="trajectory_marker_publisher"
+                  output="screen">
+                <remap from="trajectory" to="dp_controller/trajectory"/>
+                <remap from="waypoints" to="dp_controller/waypoints"/>
+                <remap from="reference" to="dp_controller/reference"/>
+            </node>
+            <node name="rviz" pkg="rviz" type="rviz" output="screen" args="-d $(find nemo)/rviz/$(arg namespace).rviz"/>
+        </group>
+    </group>
+</launch>

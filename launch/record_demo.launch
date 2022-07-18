@@ -1,0 +1,49 @@
+<launch>
+  <arg name="record" default="false"/>
+  <arg name="bag_filename" default="recording.bag"/>
+  <arg name="use_ned_frame" default="false"/>
+
+  <group if="$(arg record)">
+    <node pkg="rosbag" type="record" name="recording"
+      args="record -O $(arg bag_filename)
+        /nemo/dp_controller/trajectory
+        /nemo/dp_controller/reference
+        /nemo/pose_gt_ned
+        /nemo/dp_controller/error
+        /hydrodynamics/current_velocity        
+        /nemo/wrench_perturbation
+        /nemo/control_allocation/control_input
+        /nemo/thrusters/0/thrust
+        /nemo/thrusters/0/input
+        /nemo/fins/0/input
+        /nemo/fins/1/input
+        /nemo/fins/2/input
+        /nemo/fins/3/input
+        /nemo/fins/0/output
+        /nemo/fins/1/output
+        /nemo/fins/2/output
+        /nemo/fins/3/output"
+      if="$(arg use_ned_frame)"/>
+
+      <node pkg="rosbag" type="record" name="recording"
+        args="record -O $(arg bag_filename)
+          /nemo/dp_controller/trajectory
+          /nemo/dp_controller/reference
+          /nemo/pose_gt
+          /nemo/dp_controller/error
+          /hydrodynamics/current_velocity
+          /nemo/wrench_perturbation
+          /nemo/control_allocation/control_input
+          /nemo/thrusters/0/thrust
+          /nemo/thrusters/0/input
+          /nemo/fins/0/input
+          /nemo/fins/1/input
+          /nemo/fins/2/input
+          /nemo/fins/3/input
+          /nemo/fins/0/output
+          /nemo/fins/1/output
+          /nemo/fins/2/output
+          /nemo/fins/3/output"
+        unless="$(arg use_ned_frame)"/>
+  </group>
+</launch>

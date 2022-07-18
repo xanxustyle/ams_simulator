@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+
+<robot name="nemo" xmlns:xacro="http://www.ros.org/wiki/xacro" >
+  <xacro:arg name="debug" default="0"/>
+  <xacro:arg name="namespace" default="nemo"/>
+  <xacro:arg name="inertial_reference_frame" default="world"/>
+  <!-- Include the AUV macro file -->
+  <xacro:include filename="$(find nemo)/urdf/nemo_base.xacro"/>
+  <!-- Create the nemo -->
+  <xacro:nemo_base 
+    namespace="$(arg namespace)" 
+    debug="$(arg debug)"
+    inertial_reference_frame="$(arg inertial_reference_frame)">
+  </xacro:nemo_base>
+  
+  <!-- Joint state publisher plugin -->
+  <xacro:default_joint_state_publisher namespace="$(arg namespace)" update_rate="50"/>
+
+</robot>
