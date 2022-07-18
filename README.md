@@ -32,9 +32,10 @@ The **Autonomous Marine System Simulator** is a set of packages that include plu
   
 # Installation
 
-This packages has been on the following ROS distribution
+This package is based on ROS Noetic and Gazebo 11.
 
-- `noetic` (See [installation instructions for ROS Noetic](https://wiki.ros.org/noetic/Installation/Ubuntu))
+- `Noetic Ninjemys` (See [installation instructions for ROS Noetic](https://wiki.ros.org/noetic/Installation/Ubuntu))
+- `Gazebo 11` (See [installation instructions for Gazebo 11](https://classic.gazebosim.org/tutorials?cat=install&tut=install_ubuntu&ver=11.0))
 
 # Purpose of the project
 
