@@ -1,6 +1,5 @@
 # `ams_simulator`: ROS-based simulations of Autonomous Marine System (AMS) with Gazebo
 
-[![GitHub issues](https://img.shields.io/github/issues/ams_simulator.svg)](https://github.com/xanxustyle/ams_simulator/issues)
 [![License](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://github.com/xanxustyle/ams_simulator/blob/main/LICENSE)
 
 The **Autonomous Marine System Simulator** is a set of packages that include plugins and ROS applications that allow simulation of underwater vehicles in [Gazebo](http://gazebosim.org/). The packages are built upon the [UUV Simulator](https://github.com/uuvsimulator/uuv_simulator).
