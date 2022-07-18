@@ -47,7 +47,7 @@ Before using it in a safety relevant setting, make sure that the software fulfil
 # License
 
 AMS Simulator is open-sourced under the Apache-2.0 license. See the
-[LICENSE](https://github.com/uuvsimulator/uuv_simulator/blob/master/LICENSE) file for details.
+[LICENSE](https://github.com/xanxustyle/ams_simulator/blob/main/LICENSE) file for details.
 
 For a list of other open source components included in UUV Simulator, see the
 file [3rd-party-licenses.txt](https://github.com/uuvsimulator/uuv_simulator/blob/master/3rd-party-licenses.txt).
