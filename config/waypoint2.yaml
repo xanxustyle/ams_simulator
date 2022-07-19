@@ -3,32 +3,32 @@ speed: &speed
 inertial_frame_id: world
 waypoints:
   -
-    point: [10, 40, -10]
+    point: [10, 40, -310]
     max_forward_speed: *speed
     heading: 0
     use_fixed_heading: False
   -
-    point: [50, 70, -10]
+    point: [50, 70, -310]
     max_forward_speed: *speed
     heading: 0
     use_fixed_heading: False
   -
-    point: [0, 150, -10]
+    point: [0, 150, -310]
     max_forward_speed: *speed
     heading: 0
     use_fixed_heading: False
   -
-    point: [120, 200, -10]
+    point: [120, 200, -310]
     max_forward_speed: *speed
     heading: 0
     use_fixed_heading: False
   -
-    point: [200, 220, -15]
+    point: [200, 220, -315]
     max_forward_speed: *speed
     heading: 0
     use_fixed_heading: False
   -
-    point: [180, 270, -15]
+    point: [180, 270, -315]
     max_forward_speed: *speed
     heading: 0
     use_fixed_heading: False

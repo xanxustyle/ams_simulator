@@ -101,24 +101,26 @@
 
 
     <!-- AUV2 launch -->
-    <include file="$(find nemo)/launch/upload_nemo.launch">
-        <arg name="namespace" value="$(arg namespace2)"/>
-        <arg name="x" value="10"/>
-        <arg name="y" value="10"/>
-        <arg name="z" value="-10"/>
-        <arg name="yaw" value="1.57"/>
-    </include>
-    <include file="$(find nemo)/launch/sm_control_nemo.launch">
-        <arg name="namespace" value="$(arg namespace2)"/>
-        <arg name="use_ned_frame" value="$(arg use_ned_frame)"/>
-    </include>
-    <node pkg="nemo" type="send_waypoint_file.py" name="send_waypoint_file" ns="$(arg namespace2)" output="screen">
-          <rosparam subst_value="true">
-                    filename: "$(find nemo)/config/waypoint_slam.yaml"
-                    start_time: -1
-                    interpolator: "lipb"
-          </rosparam>
-    </node>
+<!--    <include file="$(find nemo)/launch/upload_nemo.launch">-->
+<!--        <arg name="namespace" value="$(arg namespace2)"/>-->
+<!--        <arg name="x" value="10"/>-->
+<!--        <arg name="y" value="10"/>-->
+<!--        <arg name="z" value="-310"/>-->
+<!--        <arg name="yaw" value="1.57"/>-->
+<!--    </include>-->
+<!--    <include file="$(find nemo)/launch/sm_control_nemo.launch">-->
+<!--        <arg name="namespace" value="$(arg namespace2)"/>-->
+<!--        <arg name="use_ned_frame" value="$(arg use_ned_frame)"/>-->
+<!--    </include>-->
+<!--    <node pkg="nemo" type="send_waypoint_file.py" name="send_waypoint_file" ns="$(arg namespace2)" output="screen">-->
+<!--          <rosparam subst_value="true">-->
+<!--                    filename: "$(find nemo)/config/waypoint_slam.yaml"-->
+<!--                    start_time: -1-->
+<!--                    interpolator: "lipb"-->
+<!--          </rosparam>-->
+<!--    </node>-->
+<!--    -->
+<!--    <node name="rviz" pkg="rviz" type="rviz" output="screen" args="-d $(find nemo)/rviz/nemo1-2.rviz"/>-->
 
     <!-- Initialize the recording fo the simulation according to the record flag -->
     <include file="$(find nemo)/launch/record_demo.launch">
