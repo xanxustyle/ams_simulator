@@ -2,7 +2,7 @@
 
 [![License](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://github.com/xanxustyle/ams_simulator/blob/main/LICENSE)
 
-The **Autonomous Marine System Simulator** is a [ROS 1](http://wiki.ros.org/)- and [Gazebo](http://gazebosim.org/)-based simulation environment for fast-prototyping and evaluation of marine robotic systems. The packages are built upon the [UUV Simulator](https://github.com/uuvsimulator/uuv_simulator).
+The **Autonomous Marine System Simulator** is a [ROS 1](http://wiki.ros.org/)- and [Gazebo](http://gazebosim.org/)-based simulation environment for fast-prototyping and evaluation of marine robotic systems. The packages are built upon the [UUV Simulator](https://github.com/uuvsimulator/uuv_simulator) and [DAVE Aquatic Virtual Environment](https://doi.org/10.1109/AUV53081.2022.9965808).
 
 # Features
 
